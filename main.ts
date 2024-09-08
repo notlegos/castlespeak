@@ -88,7 +88,6 @@ function tryFinalRow (startPosition: string, minePosition: string) {
     return winner
 }
 function runIntro () {
-    pins.digitalWritePin(DigitalPin.P5, 1)
     basic.pause(500)
     theIntro = notLegos.getSoundString("Music", "Intro")
     introLength = parseFloat(theIntro.split("_")[3]) * 1000
@@ -154,15 +153,14 @@ Connected.onGesture(Connected.GestureType.Forward, function () {
     gestureGo()
 })
 function runInstructions () {
-    introGo = true
     readyInstructions = false
-    voiceNo = 5
-    for (let index = 0; index < 5; index++) {
-        politeVoice("abc", true)
-    }
+    politeVoice("5", true)
+    politeVoice("6", true)
+    politeVoice("7", true)
+    politeVoice("8", true)
+    politeVoice("9", true)
+    politeVoice("10", false)
     if (checkNoPlayer()) {
-        radioSay("Intro", "10", true)
-        basic.pause(Math.min(0, notLegos.playsFor(notLegos.getSoundString("Voice", "10"))))
         digits = Connected.tm1637Create(Connected.DigitalRJPin.J5)
         for (let index4 = 0; index4 <= 4; index4++) {
             digits.showNumber(index4)
@@ -178,9 +176,8 @@ function runInstructions () {
         digits.clear()
         basic.pause(1300)
     }
+    politeVoice("11", false)
     if (checkNoPlayer()) {
-        radioSay("Intro", "11", true)
-        basic.pause(Math.min(0, notLegos.playsFor(notLegos.getSoundString("Voice", "11"))))
         scoreCircle.clear()
         scoreCircle.setPixelColor(0, Connected.colors(Connected.NeoPixelColors.Red))
         scoreCircle.setPixelColor(1, theOrange)
@@ -197,60 +194,37 @@ function runInstructions () {
         basic.pause(200)
     }
     if (checkNoPlayer()) {
-        radioSay("Intro", "12", true)
         scoreCircle.setPixelColor(4, Connected.colors(Connected.NeoPixelColors.Green))
         scoreCircle.show()
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "12")))
     }
+    politeVoice("12", true)
     if (checkNoPlayer()) {
-        radioSay("Intro", "13", true)
         scoreCircle.setPixelColor(5, theYellow)
         scoreCircle.show()
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "13")))
     }
+    politeVoice("13", true)
     if (checkNoPlayer()) {
-        radioSay("Intro", "14", true)
         scoreCircle.setPixelColor(6, theOrange)
         scoreCircle.show()
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "14")))
     }
+    politeVoice("14", true)
     if (checkNoPlayer()) {
-        radioSay("Intro", "15", true)
         scoreCircle.setPixelColor(7, Connected.colors(Connected.NeoPixelColors.Red))
         scoreCircle.show()
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "15")))
     }
+    politeVoice("15", true)
+    politeVoice("16", true)
     if (checkNoPlayer()) {
-        radioSay("Intro", "16", true)
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "16")))
         scoreCircle.showColor(Connected.colors(Connected.NeoPixelColors.Red))
         scoreCircle.show()
         basic.pause(2700)
         scoreCircle.clear()
         scoreCircle.show()
     }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "17", true)
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "17")))
-    }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "18", true)
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "18")))
-        readyInstructions = true
-    }
+    politeVoice("17", true)
+    politeVoice("18", true)
+    readyInstructions = true
     radioSay("Intro", "19", true)
-}
-function printArray (toPrint: any[]) {
-    lineCount = toPrint.length
-    Connected.oledClear()
-    Connected.showUserNumber(8, lineCount)
-    if (lineCount > 0) {
-        for (let thisLine = 0; thisLine <= lineCount - 1; thisLine++) {
-            Connected.showUserText(thisLine + 1, toPrint[thisLine])
-        }
-    } else {
-        Connected.showUserText(1, "[Empty]")
-    }
 }
 function startGame () {
     firstRun = true
@@ -582,9 +556,6 @@ let listenStart = false
 let listenIntro = false
 let listenGo = false
 let listenAbort = false
-let lineCount = 0
-let voiceNo = 0
-let introGo = false
 let laserBreaks3: boolean[] = []
 let awaitingStep = false
 let passed = false
@@ -628,7 +599,7 @@ let buttonBlock = false
 let isReady = false
 led.enable(false)
 pins.setAudioPinEnabled(false)
-pins.digitalWritePin(DigitalPin.P5, 0)
+pins.digitalWritePin(DigitalPin.P5, 1)
 Connected.MP3SetPort(Connected.DigitalRJPin.P14)
 Connected.execute(Connected.playType.Stop)
 Connected.MP3SetPort(Connected.DigitalRJPin.P15)
