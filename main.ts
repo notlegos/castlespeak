@@ -15,7 +15,7 @@ function awaitPlayer () {
             } else if (isNearly(98, thisColor, 1)) {
                 Connected.showUserText(5, "" + thisColor + "tan")
                 thePlayer = "Wario"
-            } else if (isNearly(135, thisColor, 0.5)) {
+            } else if (isNearly(0, thisColor, 0.5)) {
                 Connected.showUserText(5, "" + thisColor + "green")
                 thePlayer = "Luigi"
             } else if (isNearly(72, thisColor, 1)) {
@@ -89,24 +89,17 @@ function tryFinalRow (startPosition: string, minePosition: string) {
 }
 function runIntro () {
     pins.digitalWritePin(DigitalPin.P5, 1)
-    radioSay("Intro", "0", true)
     basic.pause(500)
     theIntro = notLegos.getSoundString("Music", "Intro")
     introLength = parseFloat(theIntro.split("_")[3]) * 1000
     radioSay("Intro", convertToText(introLength), true)
+    basic.pause(500)
     basic.pause(notLegos.playsFor(theIntro))
-    radioSay("Intro", "1", true)
-    basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "0")))
-    if (checkNoPlayer()) {
-        radioSay("Intro", "2", true)
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "1")))
-    }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "3", true)
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "2")))
-        readyInstructions = true
-    }
+    politeVoice("0", true)
+    politeVoice("1", true)
+    politeVoice("2", true)
     radioSay("Intro", "4", true)
+    readyInstructions = true
 }
 function readyToGo () {
     radioSay("Intro", "32", true)
@@ -163,25 +156,9 @@ Connected.onGesture(Connected.GestureType.Forward, function () {
 function runInstructions () {
     introGo = true
     readyInstructions = false
-    if (checkNoPlayer()) {
-        radioSay("Intro", "5", true)
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "5")))
-    }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "6", true)
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "6")))
-    }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "7", true)
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "7")))
-    }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "8", true)
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "8")))
-    }
-    if (checkNoPlayer()) {
-        radioSay("Intro", "9", true)
-        basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", "9")))
+    voiceNo = 5
+    for (let index = 0; index < 5; index++) {
+        politeVoice("abc", true)
     }
     if (checkNoPlayer()) {
         radioSay("Intro", "10", true)
@@ -263,12 +240,6 @@ function runInstructions () {
     }
     radioSay("Intro", "19", true)
 }
-function readColor () {
-    while (true) {
-        Connected.showUserNumber(5, Connected.readColor())
-        basic.pause(100)
-    }
-}
 function printArray (toPrint: any[]) {
     lineCount = toPrint.length
     Connected.oledClear()
@@ -325,6 +296,16 @@ function tryField (theMines: string) {
     reachedFinalRow = false
     stepOnA(theMines)
     return passed
+}
+function politeVoice (trackNo: string, doPause: boolean) {
+    if (checkNoPlayer()) {
+        radioSay("Intro", trackNo, true)
+        if (doPause) {
+            basic.pause(notLegos.playsFor(notLegos.getSoundString("Voice", trackNo)))
+        } else {
+            basic.pause(Math.min(0, notLegos.playsFor(notLegos.getSoundString("Voice", trackNo))))
+        }
+    }
 }
 function radioSay (Space: string, Effect: string, Debug: boolean) {
     sendString = "" + btToken + Space
@@ -389,17 +370,15 @@ Connected.onGesture(Connected.GestureType.Backward, function () {
     gestureGo()
 })
 function generateMinefields () {
-    masterAvoidList2 = [
-    "CEH",
-    "CEI",
-    "CFH",
-    "CFI",
-    "BDH",
-    "BDI",
-    "BGH",
-    "BGI"
-    ]
-    return shuffleList(masterAvoidList2)
+    masterAvoidList2 = "CEH_CEI_CFH_CFI_BDH_BDI_BGH_BGI".split("_")
+    listOut2 = ["temp"]
+    while (masterAvoidList2.length > 0) {
+        thisItem = masterAvoidList2._pickRandom()
+        listOut2.push(thisItem)
+        masterAvoidList2.removeAt(masterAvoidList2.indexOf(thisItem))
+    }
+    listOut2.shift()
+    return listOut2
 }
 function stepOnE (theMines: string) {
     if (theMines.indexOf("E") >= 0) {
@@ -428,32 +407,6 @@ function wonSequence (fieldScores: any[]) {
     radioSay("Won", "0", true)
     Connected.oledClear()
     Connected.showUserText(1, "WINNER!")
-    basic.pause(2000)
-    radioSay("Won", "1", true)
-    basic.pause(2000)
-    radioSay("Won", "2", true)
-    basic.pause(2000)
-    radioSay("Won", "3", true)
-    basic.pause(2000)
-    radioSay("Won", "4", true)
-    basic.pause(2000)
-    radioSay("Won", "5", true)
-    basic.pause(2000)
-    radioSay("Won", "6", true)
-    basic.pause(2000)
-    radioSay("Won", "7", true)
-    basic.pause(2000)
-    radioSay("Won", "8", true)
-}
-function shuffleList (listIn: string[]) {
-    listOut2 = ["temp"]
-    while (listIn.length > 0) {
-        thisItem = listIn._pickRandom()
-        listOut2.push(thisItem)
-        listIn.removeAt(listIn.indexOf(thisItem))
-    }
-    listOut2.shift()
-    return listOut2
 }
 function stepOnG (theMines: string) {
     if (theMines.indexOf("G") >= 0) {
@@ -563,22 +516,6 @@ function lostSequence (fieldScores: any[]) {
     readyInstructions = false
     Connected.oledClear()
     Connected.showUserText(1, "GAME OVER")
-    basic.pause(5000)
-    radioSay("Lost", "1", true)
-    basic.pause(2000)
-    radioSay("Lost", "2", true)
-    basic.pause(2000)
-    radioSay("Lost", "3", true)
-    basic.pause(2000)
-    radioSay("Lost", "4", true)
-    basic.pause(2000)
-    radioSay("Lost", "5", true)
-    basic.pause(2000)
-    radioSay("Lost", "6", true)
-    basic.pause(2000)
-    radioSay("Lost", "7", true)
-    basic.pause(2000)
-    radioSay("Lost", "8", true)
 }
 Connected.onGesture(Connected.GestureType.Right, function () {
     Connected.showUserText(2, "gesture right")
@@ -615,7 +552,7 @@ Connected.onGesture(Connected.GestureType.Down, function () {
 })
 function checkNoPlayer () {
     Connected.showUserNumber(3, Connected.readColor())
-    return isNearly(backgroundColor, Math.round(Connected.readColor()), 1)
+    return isNearly(backgroundColor, Math.round(Connected.readColor()), 2)
 }
 let lastRead = 0
 let thisRead = 0
@@ -629,9 +566,9 @@ let instruction = ""
 let laserBreaks9: boolean[] = []
 let laserBreaks8: boolean[] = []
 let laserBreaks7: boolean[] = []
+let laserBreaks6: boolean[] = []
 let thisItem = ""
 let listOut2: string[] = []
-let laserBreaks6: boolean[] = []
 let masterAvoidList2: string[] = []
 let laserBreaks5: boolean[] = []
 let laserBreaks4: boolean[] = []
@@ -646,6 +583,7 @@ let listenIntro = false
 let listenGo = false
 let listenAbort = false
 let lineCount = 0
+let voiceNo = 0
 let introGo = false
 let laserBreaks3: boolean[] = []
 let awaitingStep = false
@@ -717,15 +655,20 @@ scoreCircle.clear()
 scoreCircle.show()
 digitsClear()
 colorReads = [0, 0]
-backgroundColor = 136
+backgroundColor = 135
 Connected.oledClear()
 for (let index = 0; index < 0; index++) {
-    readColor()
+    while (true) {
+        Connected.showUserNumber(5, Connected.readColor())
+        basic.pause(100)
+    }
 }
-runIntro()
-awaitPlayer()
 for (let index = 0; index < 0; index++) {
     runInstructions()
+}
+for (let index = 0; index < 1; index++) {
+    runIntro()
+    awaitPlayer()
 }
 loops.everyInterval(250, function () {
     thisRead = notLegos.potRead()

@@ -595,9 +595,6 @@ namespace notLegos {
             case DigitalRJPin.P4:
                 pin = DigitalPin.P4
                 break;
-            case DigitalRJPin.P4:
-                pin = DigitalPin.P4
-                break;
             case DigitalRJPin.P5:
                 pin = DigitalPin.P5
                 break;
